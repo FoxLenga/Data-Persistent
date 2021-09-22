@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class Paddle : MonoBehaviour
 {
+    /// <summary>
+    /// This script handles speed
+    /// </summary>
     public float Speed = 2.0f;
     public float MaxMovement = 2.0f;
     

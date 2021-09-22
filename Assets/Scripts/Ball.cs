@@ -11,7 +11,15 @@ public class Ball : MonoBehaviour
     {
         m_Rigidbody = GetComponent<Rigidbody>();
     }
-    
+    //move the ball up on key click
+    public void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+           // transform.
+        }
+    }
+
     private void OnCollisionExit(Collision other)
     {
         var velocity = m_Rigidbody.velocity;
