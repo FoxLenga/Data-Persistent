@@ -14,7 +14,9 @@ public class MainManager : MonoBehaviour
     public Rigidbody Ball;
 
     public Text ScoreText;
+    public Text BestScore;
     public GameObject GameOverText;
+    public Text playerName;
 
     private bool m_Started = false;
     private int m_Points;
@@ -23,10 +25,14 @@ public class MainManager : MonoBehaviour
     public GameObject canvas; //reference to our canvas gameobject
 
 
-
+    private void Awake()
+    {
+        
+    }
     // Start is called before the first frame update
     void Start()
     {
+       
         const float step = 0.6f;
         int perLine = Mathf.FloorToInt(4.0f / step);
 
@@ -41,6 +47,15 @@ public class MainManager : MonoBehaviour
                 brick.onDestroyed.AddListener(AddPoint);
             }
         }
+
+        playerName = GetComponent<Text>();
+        if(m_Points > PlayerPrefs.GetInt("Best Score", 0))
+        {
+            BestScore.text = PlayerPrefs.GetInt("Best Score", 0).ToString();//persistant score
+        }
+        
+        playerName.text = PlayerPrefs.GetString("Player Name").ToString();//persistent name
+
     }
 
     private void Update()
@@ -71,6 +86,9 @@ public class MainManager : MonoBehaviour
     {
         m_Points += point;
         ScoreText.text = $"Score : {m_Points}";
+
+        //high score
+        PlayerPrefs.SetInt("Best Score", m_Points);
     }
     //start new game
     public void StartNew()
@@ -91,7 +109,7 @@ public class MainManager : MonoBehaviour
     //serialized data
     [System.Serializable]
 
-    class SaveData
+    class SaveData 
     {
         public string playerName;
         public int BestScore;
@@ -99,7 +117,18 @@ public class MainManager : MonoBehaviour
     //save best score
     public void BestScored()
     {
-        SaveData bScore = new SaveData();
-        bScore.BestScore = BestScore;
+       SaveData bScore = new SaveData();
+       // bScore.BestScore = BestScore;
     }
+    //void Name()
+    //{
+    //    SaveData playerName = new SaveData();
+
+    //    foreach(char letter in Input.inputString)
+    //    {
+    //        if(playerName != 0)
+    //        playerName.Text = playerName.text.Substring(0, playerName.le)
+    //    }
+        
+    //}
 }
