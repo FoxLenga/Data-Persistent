@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using System.IO;
 
 public class MainManager : MonoBehaviour
 {
@@ -14,9 +15,9 @@ public class MainManager : MonoBehaviour
     public Rigidbody Ball;
 
     public Text ScoreText;
-    public Text BestScore;
+    public int BestScoreText;
     public GameObject GameOverText;
-    public Text playerName;
+    public Text playerNameText;
 
     private bool m_Started = false;
     private int m_Points;
@@ -24,11 +25,18 @@ public class MainManager : MonoBehaviour
     private bool m_GameOver = false;
     public GameObject canvas; //reference to our canvas gameobject
 
+    public static MainManager instance;//accessible everywhere in the game and persistent
 
-    private void Awake()
-    {
-        
-    }
+
+    //private void Awake()
+    //{
+    //    if(instance != null)
+    //    {
+    //        Destroy(gameObject);
+    //    }
+    //    instance = this;
+    //    DontDestroyOnLoad(gameObject);
+    //}
     // Start is called before the first frame update
     void Start()
     {
@@ -48,13 +56,16 @@ public class MainManager : MonoBehaviour
             }
         }
 
-        playerName = GetComponent<Text>();
-        if(m_Points > PlayerPrefs.GetInt("Best Score", 0))
-        {
-            BestScore.text = PlayerPrefs.GetInt("Best Score", 0).ToString();//persistant score
-        }
+
+        BestScored();
+        playerNameText = GetComponent<Text>();
+        //if(m_Points > PlayerPrefs.GetInt("Best Score", 0))
+        //{
+        //   int BestScored = PlayerPrefs.SetInt("Best Score", m_Points);//persistant score
+        //    BestScore.text = m_Points.ToString();
+        //}
         
-        playerName.text = PlayerPrefs.GetString("Player Name").ToString();//persistent name
+       // playerName.text = PlayerPrefs.GetString("Player Name").ToString();//persistent name
 
     }
 
@@ -87,19 +98,16 @@ public class MainManager : MonoBehaviour
         m_Points += point;
         ScoreText.text = $"Score : {m_Points}";
 
+
         //high score
-        PlayerPrefs.SetInt("Best Score", m_Points);
+        //PlayerPrefs.SetInt("Best Score", 0);
     }
     //start new game
     public void StartNew()
     {
         SceneManager.LoadScene(0); //load scene at index 1
     }
-    //void PlayerName()
-    //{
-    //    inputField = canvas.transform.Find(InputField / Text).GetComponent<Text>();
-    //}
-
+    
     public void GameOver()
     {
         m_GameOver = true;
@@ -113,12 +121,57 @@ public class MainManager : MonoBehaviour
     {
         public string playerName;
         public int BestScore;
+
+        MenuHandler handler = new MenuHandler();
     }
     //save best score
     public void BestScored()
     {
        SaveData bScore = new SaveData();
-       // bScore.BestScore = BestScore;
+        bScore.BestScore = m_Points;
+
+        //JSON
+        string json = JsonUtility.ToJson(bScore);
+        File.WriteAllText(Application.persistentDataPath + "/saveBestScore.json", json);
+        //if (m_Points > PlayerPrefs.GetInt("Best Score", 0))
+        //{
+        //      PlayerPrefs.SetInt("Best Score", m_Points);//persistant score
+        //    BestScore.text = m_Points.ToString();
+        //}
+    }
+    public void PlayerName()
+    {
+        SaveData saveName = new SaveData();
+        saveName.playerName = MenuHandler.userName.ToString(); //set the plaey name
+
+        //JSON
+        string json = JsonUtility.ToJson(saveName);
+        File.WriteAllText(Application.persistentDataPath + "/savePlayerName", json);
+
+    }
+
+    public void LoadData()
+    {
+        string ScorePath = Application.persistentDataPath + "/saveBestScore.json";
+        if (File.Exists(ScorePath))
+        {
+            string json = File.ReadAllText(ScorePath);
+            SaveData data = JsonUtility.FromJson < SaveData > (json);
+
+            BestScoreText = data.BestScore; //assign the returned value to best score
+        }
+
+        string NamePath = Application.persistentDataPath + "/savePlayerName.json";
+        if (File.Exists(NamePath))
+        {
+            string json = File.ReadAllText(NamePath); //read the name path if exist
+            SaveData saveData = JsonUtility.FromJson<SaveData>(json);
+
+            //assign the returned values
+            playerNameText.text = saveData.playerName.ToString();
+            playerNameText.text = $"Name: {playerNameText}";
+        }
+
     }
     //void Name()
     //{

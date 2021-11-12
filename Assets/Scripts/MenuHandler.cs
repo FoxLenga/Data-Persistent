@@ -20,9 +20,4 @@ public class MenuHandler : MonoBehaviour
         userName = newName;
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 }
